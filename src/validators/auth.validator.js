@@ -33,7 +33,7 @@ export const registerValidator=[
 export const loginValidator=[
     body('email')
     .trim()
-    .isEmpty().withMessage("Email is Required")
+    .notEmpty().withMessage("Email is Required")
     .isEmail().withMessage("Please provide valid Email"),
 
     body('password')
