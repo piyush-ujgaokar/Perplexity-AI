@@ -1,22 +1,40 @@
 import React, { useState } from 'react'
-import { Link} from 'react-router'
+import { Link, Navigate, useNavigate} from 'react-router'
+import { useAuth } from '../hook/useAuth'
+import { useSelector } from 'react-redux'
+
 
 
 const Login = () => {
     const [ email, setEmail ] = useState('')
     const [ password, setPassword ] = useState('')
 
+    const user=useSelector(state=>state.auth.user)
+    const loading=useSelector(state=>state.auth.loading)
+
+
+    const {handleLogin}=useAuth()
+
+
+    const navigate=useNavigate()
     const submitForm = async (event) => {
         event.preventDefault()
+
 
         const payload = {
             email,
             password,
         }
 
-        console.log("Login payload",payload);
-        
+        await handleLogin(payload)
+        navigate('/')
 
+        console.log("Login payload",payload);
+    }
+
+          
+    if(!loading && user){
+        return <Navigate to='/' replace/>
     }
 
     return (
