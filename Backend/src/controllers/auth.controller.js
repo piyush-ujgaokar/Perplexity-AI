@@ -37,15 +37,15 @@ export async function register(req,res){
 
     await sendEmail({
         to:email,
-        subject:"Welcome to perplexity",
+        subject:"Welcome to Xhancy-Ai",
         html:`
                 <p>Hii ${username},</p>
-                <p>Thankyou for registering At Perplexity. We re Excited to have you on board!</p>
+                <p>Thankyou for registering At Xhancy-Ai. We re Excited to have you on board!</p>
                 <p>Please verify your email by clicking the link below:</p>
                 <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
                 <p>Best Regards, 
                 <br/> 
-                The perplexity team
+                The Xhancy-Ai team
                 </p>`
     })
 
@@ -131,7 +131,6 @@ export async function getMe(req,res) {
             success:true,
             user
         })
-
 }
 
 export async function verifyEmail(req,res){

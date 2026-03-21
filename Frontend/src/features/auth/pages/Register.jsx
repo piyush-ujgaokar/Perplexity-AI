@@ -12,7 +12,6 @@ const Register = () => {
     const payload = {
       username,
       email,
-      password,
     }
 
     console.log('Register payload:', payload)

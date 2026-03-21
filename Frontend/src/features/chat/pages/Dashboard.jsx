@@ -61,6 +61,8 @@ const Dashboard = () => {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState(null)
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   const openDeleteConfirm = (chatId) => {
     setPendingDeleteId(chatId)
     setConfirmOpen(true)
@@ -140,7 +142,8 @@ const Dashboard = () => {
         .fade-in { animation: fadeInMsg 360ms ease forwards; }
       `}</style>
       <section className='mx-auto flex h-[calc(100vh-1.5rem)] w-full gap-4 rounded-3xl p-1 md:h-[calc(100vh-2.5rem)] md:gap-6 md:p-1'>
-        <aside className='hidden h-full w-65 shrink-0 rounded-3xl app-sidebar p-4 md:flex md:flex-col themed-rounded'>
+        {/* Desktop sidebar */}
+        <aside className='hidden h-full w-65 shrink-0 rounded-3xl app-sidebar p-4 lg:flex lg:flex-col themed-rounded'>
             <div className='mb-4 flex items-center justify-between'>
             <div>
               <h2 className='text-sm text-muted'>Xhancy-Ai</h2>
@@ -204,7 +207,98 @@ const Dashboard = () => {
           </div>
         </aside>
 
+        {/* Mobile sidebar - off-canvas */}
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className='h-full rounded-r-3xl bg-[var(--sidebar)] p-4 shadow-xl flex flex-col themed-rounded'>
+            <div className='mb-4 flex items-center justify-between'>
+              <div>
+                <h2 className='text-sm text-muted'>Xhancy-Ai</h2>
+                <h1 className='text-xl font-semibold tracking-tight'>Recent Chats</h1>
+              </div>
+
+              <div className='flex items-center gap-2'>
+                <button
+                  type='button'
+                  onClick={() => chat.handleCreateChat && chat.handleCreateChat()}
+                  className='ml-2 btn btn-glow'
+                >
+                  New
+                </button>
+
+                <ThemeToggle />
+              </div>
+            </div>
+
+            <button aria-label='Close sidebar' className='absolute right-3 top-3 lg:hidden' onClick={() => setSidebarOpen(false)}>
+              <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' className='icon'>
+                <line x1='18' y1='6' x2='6' y2='18'></line>
+                <line x1='6' y1='6' x2='18' y2='18'></line>
+              </svg>
+            </button>
+
+            <div className='flex-1 overflow-y-auto pr-1 mt-6'>
+              {Object.values(chats).length === 0 && (
+                <p className='text-sm text-muted'>No chats yet. Create a new chat to begin.</p>
+              )}
+
+              <div className='space-y-2 mt-3'>
+                {Object.values(chats).map((c, index) => (
+                  <div
+                    onClick={() => { openChat(c.id); setSidebarOpen(false) }}
+                    key={c.id || index}
+                    role='button'
+                    tabIndex={0}
+                    className={`group w-full cursor-pointer rounded-full px-3 py-2 text-left text-sm font-medium transition flex items-center justify-between ${
+                      c.id === currentChatId
+                        ? 'border-2 bg-soft text-primary border-theme btn-glow'
+                        : 'text-muted hover:brightness-110'
+                    }`}
+                  >
+                    <span className='truncate mr-3'>{c.title || 'Untitled'}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openDeleteConfirm(c.id) }}
+                      type='button'
+                      aria-label='Delete chat'
+                      className='opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-muted hover:text-danger'
+                      title='Delete chat'
+                    >
+                      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' className='icon'>
+                        <polyline points='3 6 5 6 21 6'></polyline>
+                        <path d='M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6'></path>
+                        <path d='M10 11v6'></path>
+                        <path d='M14 11v6'></path>
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className='mt-4 text-sm text-muted'>
+              <p>Logged in as</p>
+              <p className='mt-1 font-medium text-primary'>You</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Overlay for mobile when sidebar open */}
+        {sidebarOpen && (
+          <div className='fixed inset-0 z-40 lg:hidden'>
+            <div className='absolute inset-0 bg-black/50' onClick={() => setSidebarOpen(false)}></div>
+          </div>
+        )}
+
         <section className='relative mx-auto flex h-full min-w-0 flex-1 flex-col gap-4'>
+          {/* Mobile top bar with hamburger (visible only on mobile) */}
+          <div className='flex items-center justify-between lg:hidden mb-2'>
+            <button aria-label='Open menu' className='p-2' onClick={() => setSidebarOpen(true)}>
+              <svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' className='icon'>
+                <line x1='3' y1='12' x2='21' y2='12'></line>
+                <line x1='3' y1='6' x2='21' y2='6'></line>
+                <line x1='3' y1='18' x2='21' y2='18'></line>
+              </svg>
+            </button>
+          </div>
 
           {/* Main messages / hero area */}
           <div className='messages flex-1 overflow-y-auto pr-4' style={{ paddingBottom: '6.5rem' }}>
