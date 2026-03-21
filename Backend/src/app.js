@@ -5,6 +5,7 @@ import chatRouter from './routes/chat.routes.js'
 import morgan from 'morgan'
 import cors from 'cors'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 
 const app=express()
@@ -18,6 +19,9 @@ app.use(cors({
     credentials:true,
     methods:['GET','POST','PUT','DELETE']
 }))
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 app.use(express.static(path.join(__dirname, '../public')))
 
