@@ -42,6 +42,15 @@ const chatSlice=createSlice({
             const {chatId,messages}=action.payload
             state.chats[chatId].messages.push(...messages)
         },
+        removeChat:(state,action)=>{
+            const {chatId} = action.payload
+            if(state.chats[chatId]){
+                delete state.chats[chatId]
+            }
+            if(state.currentChatId === chatId){
+                state.currentChatId = null
+            }
+        },
         setChats:(state,action)=>{
             state.chats=action.payload
         },
@@ -58,5 +67,5 @@ const chatSlice=createSlice({
 })
 
 
-export const {setCurrentChatId,setChats,setLoading,setError,createNewchat,addNewMessage,updateLastMessage,addMessages}=chatSlice.actions
+export const {setCurrentChatId,setChats,setLoading,setError,createNewchat,addNewMessage,updateLastMessage,addMessages,removeChat}=chatSlice.actions
 export default chatSlice.reducer

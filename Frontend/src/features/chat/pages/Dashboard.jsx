@@ -140,11 +140,11 @@ const Dashboard = () => {
         .fade-in { animation: fadeInMsg 360ms ease forwards; }
       `}</style>
       <section className='mx-auto flex h-[calc(100vh-1.5rem)] w-full gap-4 rounded-3xl p-1 md:h-[calc(100vh-2.5rem)] md:gap-6 md:p-1'>
-        <aside className='hidden h-full w-[260px] shrink-0 rounded-3xl app-sidebar p-4 md:flex md:flex-col themed-rounded'>
+        <aside className='hidden h-full w-65 shrink-0 rounded-3xl app-sidebar p-4 md:flex md:flex-col themed-rounded'>
             <div className='mb-4 flex items-center justify-between'>
             <div>
               <h2 className='text-sm text-muted'>Xhancy-Ai</h2>
-              <h1 className='text-xl font-semibold tracking-tight'>Chats</h1>
+              <h1 className='text-xl font-semibold tracking-tight'>Recent Chats</h1>
             </div>
 
             <div className='flex items-center gap-2'>
@@ -179,6 +179,20 @@ const Dashboard = () => {
                   }`}
                 >
                   <span className='truncate mr-3'>{c.title || 'Untitled'}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openDeleteConfirm(c.id) }}
+                    type='button'
+                    aria-label='Delete chat'
+                    className='opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-muted hover:text-danger'
+                    title='Delete chat'
+                  >
+                    <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' className='icon'>
+                      <polyline points='3 6 5 6 21 6'></polyline>
+                      <path d='M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6'></path>
+                      <path d='M10 11v6'></path>
+                      <path d='M14 11v6'></path>
+                    </svg>
+                  </button>
                 </div>
               ))}
             </div>
@@ -211,7 +225,7 @@ const Dashboard = () => {
                     key={message.id}
                     className={`max-w-[82%] w-fit rounded-2xl px-4 py-3 text-sm md:text-base fade-in ${
                       message.role === 'user'
-                        ? 'ml-auto rounded-br-none bg-gradient-to-r from-indigo-700/40 to-violet-700/30 text-primary'
+                          ? 'ml-auto rounded-br-none bg-soft text-primary'
                         : 'mr-auto rounded-bl-none bg-soft text-primary'
                     }`}
                   >
@@ -242,7 +256,7 @@ const Dashboard = () => {
           </div>
 
           {confirmOpen && (
-            <div className='fixed inset-0 z-50 flex items-center justify-center'>
+            <div className='fixed inset-0 z-50 flex bg-black items-center justify-center'>
               <div className='absolute inset-0 bg-black/50' onClick={cancelDelete}></div>
               <div className='relative w-full max-w-md rounded-lg bg-panel p-6'>
                 <h3 className='text-lg font-semibold'>Are you sure you want to delete this chat?</h3>
