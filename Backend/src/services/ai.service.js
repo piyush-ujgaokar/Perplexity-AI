@@ -1,27 +1,52 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, SystemMessage,AIMessage } from "langchain";
+import { HumanMessage, SystemMessage,AIMessage,tool,createAgent } from "langchain";
 import { ChatMistralAI } from "@langchain/mistralai";
+import *as z from "zod";
+import { searchInternet } from "./Internet.service.js";
+
 
 const geminiModel = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash-lite",
+  model: "gemini-flash-latest",
   apiKey: process.env.GEMINI_API_KEY,
 });
 
 const mistralModel = new ChatMistralAI({
-  model: "mistral-small-latest",
+  model: "mistral-medium-latest",
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
+const searchInternetTool=tool(
+  searchInternet,
+  {
+    name:"searchInternet",
+    description:"use this tool to get latest information from internet.",
+    schema:z.object({
+      query:z.string().describe("The query to search on internet")
+    })
+  }
+)
+
+const agent=createAgent({
+  model:mistralModel,
+  tools:[searchInternetTool]
+})
+
 export async function generateResponse(messages) {
-  const response = await geminiModel.invoke(messages.map(msg=>{
+  const response = await agent.invoke({
+    messages: [
+      new SystemMessage(`you are a helpful and presice assistent for answering questions.
+        If you dont know the answer say you dont know.
+        if the question requires up to date information, use the "searchInternet" tool to get the latest information from internet and then answer the question based on that information.`),
+      ...(messages.map(msg=>{
     if(msg.role=='user'){
       return new HumanMessage(msg.content)
     }else if(msg.role=='ai'){
       return new AIMessage(msg.content)
     }
-  }));
+  }))]
+  });
 
-  return response.text;
+  return response.messages[response.messages.length-1].text;
 }
 
 export async function generateChatTitle(message) {
