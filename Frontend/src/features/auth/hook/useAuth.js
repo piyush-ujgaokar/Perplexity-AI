@@ -14,7 +14,8 @@ export function useAuth(){
             dispatch(setLoading(true))
 
             const data=await register({username,email,password})
-            dispatch(setUser(data.user))
+            // registration does not log the user in; ask user to verify email
+            // do not set `user` here to avoid treating unverified users as authenticated
         }catch(error){
             dispatch(setError(error.response?.data?.message || "Registration Failed"))
         }finally{
@@ -27,6 +28,10 @@ export function useAuth(){
 
             dispatch(setLoading(true))
             const data=await login({email,password})
+            // save token (if provided) so we can use Authorization header as fallback
+            if(data.token){
+                localStorage.setItem('token', data.token)
+            }
             dispatch(setUser(data.user))
         } catch (error) {
             dispatch(setError(error.response?.data?.message || "Login Failed"))

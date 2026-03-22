@@ -99,15 +99,23 @@ export async function login(req,res){
         username:user.username
     },process.env.JWT_SECRET,{expiresIn:'7d'})
 
-    res.cookie('token',token)
+    // set cookie with some sensible defaults
+    res.cookie('token', token, {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production'
+    })
 
+    // return token in response as well so clients that cannot rely on cookies
+    // (cross-port dev setups) can use the Authorization header as fallback
     res.status(200).json({
-        message:"User logged in Successfully",
-        success:true,
-        user:{
-            id:user._id,
-            username:user.username,
-            email:user.email
+        message: "User logged in Successfully",
+        success: true,
+        token,
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email
         }
     })
 

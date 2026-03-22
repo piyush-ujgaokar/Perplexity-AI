@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const api=axios.create({
-    baseURL:"https://perplexity-ai-bqs2.onrender.com",
+    baseURL:"http://localhost:3000",
     withCredentials:true
 })
 
@@ -18,6 +18,8 @@ export async function login({email,password}){
 }
 
 export async function getMe(){
-        const response=await api.get('/api/auth/get-me')
-        return response.data
+    const token = localStorage.getItem('token')
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+    const response = await api.get('/api/auth/get-me', { headers })
+    return response.data
 }
