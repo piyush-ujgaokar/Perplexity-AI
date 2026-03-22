@@ -163,7 +163,7 @@ export async function verifyEmail(req,res){
     const html=`
         <h1>Email Verified Successfully</h1>
         <p>Your email has been verified successfully. You can now login to your account.</p>
-        <a href="http://localhost:3000/login">Login Now</a>
+        <a href="">Login Now</a>
     `
 
    return res.send(html)
