@@ -2,7 +2,7 @@ import axios from 'axios'
 
 
 const api=axios.create({
-    baseURL:"http://localhost:3000",
+    baseURL:"https://perplexity-ai-1-umbd.onrender.com",
     withCredentials:true
 })
 

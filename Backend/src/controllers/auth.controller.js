@@ -1,6 +1,7 @@
 import userModel from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
-import { sendEmail } from '../services/mail.service.js'
+// Commented out to disable sending emails during development
+// import { sendEmail } from '../services/mail.service.js'
 
 
 export async function register(req,res){
@@ -30,32 +31,30 @@ export async function register(req,res){
         password
     })
 
-    const emailVerificationToken=jwt.sign({
-        email:user.email
-    },process.env.JWT_SECRET)
+    // Auto-verify the user so they can log in immediately
+    user.verified = true
+    await user.save()
 
+    // Create auth token and set cookie so client can redirect to Dashboard
+    const token = jwt.sign({
+        id: user._id,
+        username: user.username
+    }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
-    await sendEmail({
-        to:email,
-        subject:"Welcome to Xhancy-Ai",
-        html:`
-                <p>Hii ${username},</p>
-                <p>Thankyou for registering At Xhancy-Ai. We re Excited to have you on board!</p>
-                <p>Please verify your email by clicking the link below:</p>
-                <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
-                <p>Best Regards, 
-                <br/> 
-                The Xhancy-Ai team
-                </p>`
+    res.cookie('token', token, {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production'
     })
 
     res.status(201).json({
-        messgae:"user Registered Successfully",
-        success:true,
-        user:{
-            id:user._id,
-            email:user.email,
-            username:user.username
+        message: "User registered successfully",
+        success: true,
+        token,
+        user: {
+            id: user._id,
+            email: user.email,
+            username: user.username
         }
     })
 
@@ -86,13 +85,6 @@ export async function login(req,res){
         })
     }
 
-    if(!user.verified){
-            return res.status(400).json({
-            message:"Please verify your Email Before Logging In",
-            success:false,
-            err:"Email Not verified"
-        })
-    }
 
     const token =jwt.sign({
         id:user._id,
