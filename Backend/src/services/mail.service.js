@@ -1,34 +1,25 @@
-import nodemailer from 'nodemailer'
 
+import { Resend } from "resend";
 
-const transporter=nodemailer.createTransport({
-    service:"gmail",
-    auth:{
-        type: 'OAuth2',
-        user:process.env.GOOGLE_USER,
-        clientId:process.env.GOOGLE_CLIENT_ID,
-        clientSecret:process.env.GOOGLE_CLIENT_SECRET,
-        refreshToken:process.env.GOOGLE_REFRESH_TOKEN
-    }
+// Initialize Resend with API Key
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-})
+// Reusable email function
+export async function sendEmail({ to, subject, text, html }) {
+  try {
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev", // default sender (works for testing)
+      to,
+      subject,
+      text,
+      html,
+    });
 
-
-transporter.verify()
-.then(()=>{console.log("Email transporter is Ready to send Email")})
-.catch((err)=>{console.error("Email transporter Verification failed:",err)})
-
-
-export async function sendEmail({to,subject,text,html}){
-    const mailOptions={
-        from:process.env.GOOGLE_USER,
-        to,
-        subject,
-        text,
-        html
-    }
-
-    const details=await transporter.sendMail(mailOptions)
-    console.log("Email sent: ",details)
-
+    console.log("✅ Email sent successfully:", response);
+    return response;
+  } catch (error) {
+    console.error("❌ Email sending failed:", error);
+    throw error;
+  }
 }
+
